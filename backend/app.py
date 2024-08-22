@@ -2,6 +2,7 @@ import os
 
 import firebase_admin
 import segno
+import uvicorn
 from fastapi import BackgroundTasks, FastAPI, File, Form, UploadFile
 from fastapi.responses import FileResponse
 from firebase_admin import storage
@@ -50,6 +51,4 @@ async def upload_file(
 
 
 if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
