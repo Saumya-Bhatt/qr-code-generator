@@ -50,3 +50,9 @@ async def upload_file(
     qr_file_name = await _generate_qr_image(url, file_name)
     background_tasks.add_task(_clean_up, qr_file_name)
     return FileResponse(qr_file_name, media_type="image/png")
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app)
