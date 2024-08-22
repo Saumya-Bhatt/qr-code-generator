@@ -4,13 +4,10 @@ import firebase_admin
 import segno
 from fastapi import BackgroundTasks, FastAPI, File, Form, UploadFile
 from fastapi.responses import FileResponse
-from firebase_admin import credentials, storage
+from firebase_admin import storage
 
 app = FastAPI()
-cred = credentials.Certificate("firebase-service-account.secrets.json")
-firebase_admin.initialize_app(
-    cred, {"storageBucket": "qr-code-generator-f0b11.appspot.com"}
-)
+firebase_admin.initialize_app({"storageBucket": "qr-code-generator-f0b11.appspot.com"})
 bucket = storage.bucket()
 
 
