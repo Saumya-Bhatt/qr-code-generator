@@ -1,11 +1,12 @@
+import io
 import json
 import os
 
 import firebase_admin
 import segno
 import uvicorn
-from fastapi import BackgroundTasks, FastAPI, File, Form, UploadFile
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, File, Form, UploadFile
+from fastapi.responses import StreamingResponse
 from firebase_admin import credentials, storage
 
 app = FastAPI()
@@ -28,16 +29,13 @@ async def _upload_file(folder_name: str, file: UploadFile, public: bool = False)
         return blob.public_url
 
 
-async def _generate_qr_image(link: str, file_name: str):
-    qr_file_name = f"{file_name}.png"
+async def _generate_qr_image(link: str):
     qr_code = segno.make(link)
-    qr_code.save(qr_file_name)
-    return qr_file_name
-
-
-def _clean_up(file_name):
-    if os.path.exists(file_name):
-        os.remove(file_name)
+    img = qr_code.to_pil()
+    img_byte_arr = io.BytesIO()
+    img.save(img_byte_arr, format="PNG")
+    img_byte_arr.seek(0)
+    return img_byte_arr
 
 
 @app.get("/")
@@ -46,16 +44,10 @@ async def health():
 
 
 @app.post("/upload")
-async def upload_file(
-    file: UploadFile = File(...),
-    user: str = Form(...),
-    background_tasks: BackgroundTasks = BackgroundTasks(),
-):
-    file_name = file.filename
+async def upload_file(file: UploadFile = File(...), user: str = Form(...)):
     url = await _upload_file("applications", file, public=True)
-    qr_file_name = await _generate_qr_image(url, file_name)
-    background_tasks.add_task(_clean_up, qr_file_name)
-    return FileResponse(qr_file_name, media_type="image/png")
+    qr_image = await _generate_qr_image(url)
+    return StreamingResponse(qr_image, media_type="image/png")
 
 
 if __name__ == "__main__":
