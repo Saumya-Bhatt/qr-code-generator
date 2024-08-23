@@ -17,7 +17,7 @@ authenticator = stauth.Authenticate(
 )
 name, authentication_status, username = authenticator.login('main', captcha=True)
 
-
+st.set_page_config(page_title="QR Code Generator")
 if authentication_status:
 
     authenticator.logout('Logout', 'main')
