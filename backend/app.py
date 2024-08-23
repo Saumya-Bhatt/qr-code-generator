@@ -31,9 +31,8 @@ async def _upload_file(folder_name: str, file: UploadFile, public: bool = False)
 
 async def _generate_qr_image(link: str):
     qr_code = segno.make(link)
-    img = qr_code.to_pil()
     img_byte_arr = io.BytesIO()
-    img.save(img_byte_arr, format="PNG")
+    qr_code.save(img_byte_arr, kind="png", scale=5)
     img_byte_arr.seek(0)
     return img_byte_arr
 
