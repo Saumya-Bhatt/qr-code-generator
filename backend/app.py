@@ -4,12 +4,9 @@ import os
 import firebase_admin
 import segno
 import uvicorn
-from dotenv import load_dotenv
 from fastapi import BackgroundTasks, FastAPI, File, Form, UploadFile
 from fastapi.responses import FileResponse
 from firebase_admin import credentials, storage
-
-load_dotenv()
 
 app = FastAPI()
 firebaseConfig = json.loads(os.getenv("FIREBASE_CREDENTIALS", "{}"))
