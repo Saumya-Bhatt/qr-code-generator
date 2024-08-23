@@ -1,14 +1,25 @@
+import json
 import os
 
 import firebase_admin
 import segno
 import uvicorn
+from dotenv import load_dotenv
 from fastapi import BackgroundTasks, FastAPI, File, Form, UploadFile
 from fastapi.responses import FileResponse
-from firebase_admin import storage
+from firebase_admin import credentials, storage
+
+load_dotenv()
 
 app = FastAPI()
-firebase_admin.initialize_app({"storageBucket": "qr-code-generator-f0b11.appspot.com"})
+firebaseConfig = json.loads(os.getenv("FIREBASE_CREDENTIALS", "{}"))
+try:
+    firebase_admin.initialize_app(
+        credential=credentials.Certificate(firebaseConfig),
+        options={"storageBucket": "qr-code-generator-f0b11.appspot.com"},
+    )
+except Exception:
+    print("Firebase app already initialized")
 bucket = storage.bucket()
 
 
@@ -51,4 +62,4 @@ async def upload_file(
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
